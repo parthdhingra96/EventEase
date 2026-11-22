@@ -287,6 +287,9 @@
               return "<li><strong>" + escapeHtml(item) + "</strong></li>";
             }).join("") +
           "</ul>" +
+          '<div class="ee-book-actions">' +
+            '<a class="btn ee-btn-gold ee-book-now" href="booking.html?id=' + encodeURIComponent(event.id) + "&name=" + encodeURIComponent(event.title) + "&category=" + encodeURIComponent(event.categoryLabel) + '">Book Now</a>' +
+          "</div>" +
         "</div>" +
       "</div>";
 
@@ -296,6 +299,209 @@
     }
   }
 
+  function findEvent(id) {
+    return EVENTS.filter(function (item) {
+      return item.id === id;
+    })[0];
+  }
+
+  function todayISO() {
+    var now = new Date();
+    var month = String(now.getMonth() + 1).padStart(2, "0");
+    var day = String(now.getDate()).padStart(2, "0");
+    return now.getFullYear() + "-" + month + "-" + day;
+  }
+
+  function isFullName(value) {
+    var name = value.trim();
+    return name.length >= 2 && name.length <= 80 && /^[A-Za-z]+(?:[ .'-][A-Za-z]+)*$/.test(name);
+  }
+
+  function isEmail(value) {
+    return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value.trim());
+  }
+
+  function isIndianMobile(value) {
+    var compact = String(value).replace(/[\s-]/g, "");
+    return /^(?:\+91|91|0)?[6-9]\d{9}$/.test(compact);
+  }
+
+  function isEventDate(value) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return false;
+    }
+    var parts = value.split("-");
+    var year = Number(parts[0]);
+    var month = Number(parts[1]);
+    var day = Number(parts[2]);
+    var selected = new Date(year, month - 1, day);
+    if (selected.getFullYear() !== year || selected.getMonth() !== month - 1 || selected.getDate() !== day) {
+      return false;
+    }
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return selected >= today;
+  }
+
+  function isGuestCount(value) {
+    if (!/^\d+$/.test(String(value).trim())) {
+      return false;
+    }
+    var count = Number(value);
+    return count >= 1 && count <= 20000;
+  }
+
+  function formatDisplayDate(iso) {
+    var parts = iso.split("-");
+    var date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    return date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+  }
+
+  function setFieldError(input, message) {
+    var error = document.getElementById(input.id + "Error");
+    input.classList.toggle("is-invalid", Boolean(message));
+    input.setAttribute("aria-invalid", message ? "true" : "false");
+    if (error) {
+      error.textContent = message || "";
+    }
+    return !message;
+  }
+
+  function validateBookingForm(form) {
+    var budgetOptions = ["Under ₹50,000", "₹50,000 – ₹1,50,000", "₹1,50,000 – ₹3,00,000", "₹3,00,000 – ₹5,00,000", "₹5,00,000 – ₹10,00,000", "Above ₹10,00,000"];
+    var checks = [
+      [form.fullName, isFullName(form.fullName.value) ? "" : (form.fullName.value.trim() ? "Enter a full name using letters." : "Full name is required.")],
+      [form.email, isEmail(form.email.value) ? "" : (form.email.value.trim() ? "Enter a valid email address." : "Email address is required.")],
+      [form.mobile, isIndianMobile(form.mobile.value) ? "" : (form.mobile.value.trim() ? "Enter a valid 10-digit Indian mobile number." : "Mobile number is required.")],
+      [form.eventName, form.eventName.value.trim() ? "" : "Event name is required."],
+      [form.eventCategory, form.eventCategory.value.trim() ? "" : "Event category is required."],
+      [form.eventDate, isEventDate(form.eventDate.value) ? "" : (form.eventDate.value ? "Event date cannot be in the past." : "Event date is required.")],
+      [form.eventLocation, form.eventLocation.value.trim().length >= 2 ? "" : (form.eventLocation.value.trim() ? "Enter a clearer event location." : "Event location is required.")],
+      [form.guestCount, isGuestCount(form.guestCount.value) ? "" : (String(form.guestCount.value).trim() ? "Enter the number of guests as a whole number." : "Number of guests is required.")],
+      [form.budget, budgetOptions.indexOf(form.budget.value) !== -1 ? "" : "Select an estimated budget."]
+    ];
+
+    var requirements = form.requirements.value.trim();
+    var requirementsMessage = requirements.length > 1000 ? "Additional requirements must be 1000 characters or fewer." : "";
+    checks.push([form.requirements, requirementsMessage]);
+
+    var firstInvalid = null;
+    checks.forEach(function (check) {
+      var valid = setFieldError(check[0], check[1]);
+      if (!valid && !firstInvalid) {
+        firstInvalid = check[0];
+      }
+    });
+
+    if (firstInvalid) {
+      firstInvalid.focus();
+      return false;
+    }
+    return true;
+  }
+
+  function showBookingConfirmation(form, event) {
+    var confirmation = document.getElementById("bookingConfirmation");
+    var intro = document.getElementById("bookingIntro");
+    var summary = document.getElementById("confirmationSummary");
+    var guestName = form.fullName.value.trim();
+    var eventDate = form.eventDate.value;
+    var location = form.eventLocation.value.trim();
+    var guests = form.guestCount.value.trim();
+    var budget = form.budget.value;
+
+    form.reset();
+    form.eventName.value = event.title;
+    form.eventCategory.value = event.categoryLabel;
+    form.hidden = true;
+    if (intro) {
+      intro.hidden = true;
+    }
+
+    if (summary) {
+      summary.innerHTML =
+        "<div><dt>Event name</dt><dd>" + escapeHtml(event.title) + "</dd></div>" +
+        "<div><dt>Event category</dt><dd>" + escapeHtml(event.categoryLabel) + "</dd></div>" +
+        "<div><dt>Event date</dt><dd>" + escapeHtml(formatDisplayDate(eventDate)) + "</dd></div>" +
+        "<div><dt>Event location</dt><dd>" + escapeHtml(location) + "</dd></div>" +
+        "<div><dt>Guests</dt><dd>" + escapeHtml(guests) + "</dd></div>" +
+        "<div><dt>Estimated budget</dt><dd>" + escapeHtml(budget) + "</dd></div>";
+    }
+
+    var thanks = document.getElementById("confirmationThanks");
+    if (thanks) {
+      thanks.textContent = "Thank you, " + guestName + ". Your enquiry for " + event.title + " has been checked on this page.";
+    }
+
+    if (confirmation) {
+      confirmation.hidden = false;
+      confirmation.scrollIntoView({ behavior: "smooth", block: "start" });
+      var heading = confirmation.querySelector("h2");
+      if (heading) {
+        heading.focus();
+      }
+    }
+  }
+
+  function initBookingPage() {
+    var form = document.getElementById("bookingForm");
+    if (!form) {
+      return;
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var event = findEvent(params.get("id"));
+    var panel = document.getElementById("bookingPanel");
+    var missing = document.getElementById("bookingMissing");
+
+    if (!event || params.get("name") !== event.title || params.get("category") !== event.categoryLabel) {
+      if (panel) {
+        panel.hidden = true;
+      }
+      if (missing) {
+        missing.hidden = false;
+      }
+      return;
+    }
+
+    var detailsHref = "event-details.html?id=" + encodeURIComponent(event.id);
+    var backLinks = document.querySelectorAll("[data-details-link]");
+    backLinks.forEach(function (link) {
+      link.href = detailsHref;
+    });
+
+    form.eventName.value = event.title;
+    form.eventCategory.value = event.categoryLabel;
+    document.title = "Book " + event.title + " | EventEase";
+
+    var dateInput = form.eventDate;
+    dateInput.min = todayISO();
+
+    Array.prototype.forEach.call(form.elements, function (field) {
+      if (!field.id) {
+        return;
+      }
+      field.addEventListener("input", function () {
+        if (field.classList.contains("is-invalid")) {
+          setFieldError(field, "");
+        }
+      });
+    });
+
+    form.addEventListener("submit", function (eventSubmit) {
+      eventSubmit.preventDefault();
+      if (!validateBookingForm(form)) {
+        return;
+      }
+      showBookingConfirmation(form, event);
+    });
+  }
+
   initListingPage();
   initDetailsPage();
+  initBookingPage();
 })();

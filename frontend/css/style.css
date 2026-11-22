@@ -611,8 +611,161 @@ a {
   color: var(--ee-ink-soft);
 }
 
+.ee-book-actions {
+  margin-top: 1.75rem;
+}
+
+.ee-book-now {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 12.5rem;
+  padding: 0.95rem 2.4rem;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 12px 26px rgba(154, 116, 52, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.ee-book-now:hover {
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(154, 116, 52, 0.4);
+}
+
+.ee-book-now:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 18px rgba(154, 116, 52, 0.28);
+}
+
+.ee-book-now:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(184, 145, 74, 0.35), 0 12px 26px rgba(154, 116, 52, 0.28);
+}
+
+.ee-booking-summary {
+  margin: 2rem 0 0;
+  max-width: 36rem;
+}
+
+.ee-booking-summary > div {
+  padding: 1rem 0;
+  border-top: 1px solid var(--ee-line);
+}
+
+.ee-booking-summary dt {
+  margin-bottom: 0.2rem;
+  color: var(--ee-gold-deep);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ee-booking-summary dd {
+  margin: 0;
+  color: var(--ee-ink);
+  font-size: 1.15rem;
+}
+
+.ee-booking-page {
+  padding-bottom: 4.5rem;
+}
+
+.ee-booking-form,
+.ee-confirm {
+  max-width: 52rem;
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--ee-gold-soft);
+  border-radius: var(--ee-radius);
+  background: linear-gradient(135deg, var(--ee-paper) 0%, var(--ee-cream-deep) 100%);
+  box-shadow: var(--ee-shadow);
+}
+
+.ee-booking-form .form-label {
+  margin-bottom: 0.35rem;
+  color: var(--ee-ink);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.ee-booking-form .form-control,
+.ee-booking-form .form-select {
+  border: 1px solid var(--ee-line);
+  border-radius: 0.85rem;
+  background: var(--ee-paper);
+  color: var(--ee-ink);
+  padding: 0.75rem 0.95rem;
+}
+
+.ee-booking-form .form-control:focus,
+.ee-booking-form .form-select:focus {
+  border-color: var(--ee-gold);
+  box-shadow: 0 0 0 0.2rem rgba(184, 145, 74, 0.18);
+}
+
+.ee-booking-form .form-control[readonly] {
+  background: var(--ee-cream-deep);
+  color: var(--ee-ink);
+}
+
+.ee-booking-form .form-control.is-invalid,
+.ee-booking-form .form-select.is-invalid {
+  border-color: #8c3a32;
+  background-image: none;
+}
+
+.ee-booking-form .form-control.is-invalid:focus,
+.ee-booking-form .form-select.is-invalid:focus {
+  box-shadow: 0 0 0 0.2rem rgba(140, 58, 50, 0.15);
+}
+
+.ee-field-error {
+  min-height: 1.25rem;
+  margin: 0.35rem 0 0;
+  color: #8c3a32;
+  font-size: 0.85rem;
+}
+
+.ee-field-hint {
+  margin: 0.35rem 0 0;
+  color: var(--ee-ink-soft);
+  font-size: 0.85rem;
+}
+
+.ee-confirm h2:focus {
+  outline: none;
+}
+
+.ee-confirm p {
+  color: var(--ee-ink-soft);
+}
+
+#bookingPanel[hidden],
+#bookingMissing[hidden],
+#bookingIntro[hidden],
+#bookingForm[hidden],
+#bookingConfirmation[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 575.98px) {
+  .ee-booking-form,
+  .ee-confirm {
+    padding: 1.1rem;
+  }
+}
+
 @media (max-width: 991.98px) {
   .ee-detail-frame img {
     height: 280px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .ee-book-now {
+    width: 100%;
   }
 }

@@ -65,7 +65,7 @@
 
   function setActiveLink() {
     const file = pageFileName();
-    if (file === "events.html" || file === "event-details.html") {
+    if (file === "events.html" || file === "event-details.html" || file === "booking.html") {
       menuLinks.forEach(function (link) {
         link.classList.toggle("active", link.getAttribute("href") === "events.html");
       });
