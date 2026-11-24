@@ -30,10 +30,34 @@
             <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
             <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
           </ul>
-          <div class="d-flex align-items-center gap-2 ee-auth">
-            <a class="ee-link-quiet" href="#account">Login</a>
-            <a class="btn ee-btn-gold btn-sm" href="#account">Register</a>
-          </div>
+           <div class="d-flex align-items-center gap-2 ee-auth" id="authSection">
+    <a class="ee-link-quiet" href="login.html" id="loginLink">Login</a>
+    <a class="btn ee-btn-gold btn-sm" href="register.html" id="registerLink">Register</a>
+
+    <span id="welcomeUser" style="display: none; color: #b08a45; font-weight: 600;"></span>
+    <a href="profile.html"
+   id="profileLink"
+   class="ee-link-quiet"
+   style="display: none;">
+   My Profile
+</a>
+   <a href="my-bookings.html"
+   id="myBookingsLink"
+   class="ee-link-quiet"
+   style="display: none;">
+   My Bookings
+</a>
+<a href="admin.html"
+   id="adminDashboardLink"
+   class="ee-link-quiet"
+   style="display: none;">
+   Dashboard
+</a>
+
+    <button class="btn ee-btn-gold btn-sm" id="logoutBtn" style="display: none;">
+        Logout
+    </button>
+</div>
         </div>
       </div>
     </nav>

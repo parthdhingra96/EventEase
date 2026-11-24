@@ -160,7 +160,61 @@
       highlights: ["Keynote production", "Networking breaks", "On-site guest support"]
     }
   ];
+  // Load events added by Admin from Database
+async function loadDatabaseEvents() {
+    try {
+        const response = await fetch("http://localhost:5000/api/events");
+        const result = await response.json();
 
+        if (!response.ok) {
+            throw new Error("Unable to load database events");
+        }
+
+        const databaseEvents = result.events || [];
+
+        databaseEvents.forEach(function (item) {
+
+            var category = (item.category || "other").toLowerCase().trim();
+
+var categoryMap = {
+    "weddings": "wedding",
+    "destination weddings": "destination-wedding",
+    "birthdays": "birthday",
+    "anniversaries": "anniversary",
+    "corporate events": "corporate"
+};
+
+category = categoryMap[category] || category.replace(/\s+/g, "-");
+
+            var categoryLabel = item.category || "Other Events";
+
+            var alreadyExists = EVENTS.some(function (event) {
+                return event.id === String(item.id);
+            });
+
+            if (alreadyExists) return;
+
+            EVENTS.push({
+                id: String(item.id),
+                title: item.event_name,
+                category: category,
+                categoryLabel: categoryLabel,
+                image: item.image_url || FALLBACK_IMAGE,
+                alt: item.event_name,
+                summary: item.description || "Plan your special event with EventEase.",
+                description: item.description || "Explore this event with EventEase.",
+                highlights: [
+                    "Event planning",
+                    "Venue coordination",
+                    "Guest management"
+                ]
+            });
+        });
+
+    } catch (error) {
+        console.error("Database events error:", error);
+    }
+}
   function bindImageFallback(img) {
     img.addEventListener("error", function onError() {
       img.removeEventListener("error", onError);
@@ -493,15 +547,23 @@
     });
 
     form.addEventListener("submit", function (eventSubmit) {
-      eventSubmit.preventDefault();
-      if (!validateBookingForm(form)) {
-        return;
-      }
-      showBookingConfirmation(form, event);
-    });
+  eventSubmit.preventDefault();
+
+  if (!validateBookingForm(form)) {
+    return;
   }
 
-  initListingPage();
-  initDetailsPage();
-  initBookingPage();
+  if (typeof window.submitEventEaseBooking === "function") {
+    window.submitEventEaseBooking(form, event);
+  } else {
+    alert("Booking system is not loaded. Please refresh the page.");
+  }
+});
+  }
+
+ loadDatabaseEvents().then(function () {
+    initListingPage();
+    initDetailsPage();
+    initBookingPage();
+});
 })();

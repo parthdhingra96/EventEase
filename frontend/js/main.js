@@ -65,6 +65,13 @@
 
   function setActiveLink() {
     const file = pageFileName();
+    if (file === "login.html" || file === "register.html") {
+      menuLinks.forEach(function (link) {
+        link.classList.remove("active");
+      });
+      return;
+    }
+
     if (file === "events.html" || file === "event-details.html" || file === "booking.html") {
       menuLinks.forEach(function (link) {
         link.classList.toggle("active", link.getAttribute("href") === "events.html");
@@ -99,6 +106,49 @@
     setActiveLink();
   });
 
-  updateHeaderState();
+     updateHeaderState();
   setActiveLink();
+
+  // EventEase Login / Logout functionality
+  const token = localStorage.getItem("eventeaseToken");
+  const userData = localStorage.getItem("eventeaseUser");
+
+  const loginLink = document.getElementById("loginLink");
+  const registerLink = document.getElementById("registerLink");
+  const welcomeUser = document.getElementById("welcomeUser");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const profileLink = document.getElementById("profileLink");
+  const myBookingsLink = document.getElementById("myBookingsLink");
+  const adminDashboardLink = document.getElementById("adminDashboardLink");
+
+  if (token && userData) {
+    const user = JSON.parse(userData);
+    if (adminDashboardLink && user.role === "admin") {
+    adminDashboardLink.style.display = "inline";
+}
+
+    if (loginLink) loginLink.style.display = "none";
+    if (registerLink) registerLink.style.display = "none";
+    if (profileLink) profileLink.style.display = "inline";
+    if (myBookingsLink) {
+    myBookingsLink.style.display = "inline";
+}
+
+    if (welcomeUser) {
+      welcomeUser.textContent = "Welcome, " + user.full_name;
+      welcomeUser.style.display = "inline";
+    }
+
+    if (logoutBtn) {
+      logoutBtn.style.display = "inline-block";
+
+      logoutBtn.addEventListener("click", function () {
+        localStorage.removeItem("eventeaseToken");
+        localStorage.removeItem("eventeaseUser");
+        window.location.reload();
+      });
+    }
+  }
+
 })();
+
